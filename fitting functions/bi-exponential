@@ -1,0 +1,35 @@
+function [coeffvals,rsquare] = fitbiexp(Time,Amplitude,starting_points)
+
+% fits  normalized y-component "Amplitude" and x-component "Time" to a 
+% bi-exponential and produces the corresponding coefficients and 
+% r-squared value
+
+% anonymous function
+biexp = @(a1, k1, k2, x)a1*exp(-k1*x) + (1-a1)*exp(-k2*x);
+
+% call fit function
+
+[fit_bi, gof_bi] = fit(Time, Amplitude, biexp, 'StartPoint', starting_points,...
+    'Lower', [0, 0, 0], 'Upper', [1, Inf, Inf], 'MaxFunEvals', 999999999,...
+    'MaxIter', 999999999);
+
+% coefficients
+
+coeffvals = coeffvalues(fit_bi);
+
+% convert gof_bi from structure to cell
+
+gof_bi_cell = struct2cell(gof_bi);
+
+% convert gof_bi_cell from cell to mat
+
+gof_bi_mat = cell2mat(gof_bi_cell);
+
+% extract r-square value
+
+rsquare = gof_bi_mat(2)
+
+% plot decay/growth and fit
+
+figure
+plot(fit_bi, Time, Amplitude)

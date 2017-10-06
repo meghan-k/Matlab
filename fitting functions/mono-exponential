@@ -1,0 +1,35 @@
+function [coeffvals,rsquare] = fitbiexp(Time,Amplitude,starting_points)
+
+% fits  normalized y-component "Amplitude" and x-component "Time" to a 
+% mono-exponential and produces the corresponding coefficient and 
+% r-squared value
+
+% anonymous function
+monoexp = @(k1, x)exp(-k1*x);
+
+% call fit function
+
+[fit_mono, gof_mono] = fit(Time, Amplitude, monoexp, 'StartPoint', starting_points,...
+    'Lower', 0, 'Upper', Inf, 'MaxFunEvals', 999999999,...
+    'MaxIter', 999999999);
+
+% coefficients
+
+coeffvals = coeffvalues(fit_mono);
+
+% convert gof_mono from structure to cell
+
+gof_mono_cell = struct2cell(gof_mono);
+
+% convert gof_bi_cell from cell to mat
+
+gof_mono_mat = cell2mat(gof_mono_cell);
+
+% extract r-square value
+
+rsquare = gof_mono_mat(2)
+
+% plot decay/growth and fit
+
+figure
+plot(fit_mono, Time, Amplitude)
